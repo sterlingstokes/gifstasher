@@ -18,18 +18,32 @@
         <!--[if lt IE 10]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-
-
-        <div class="hero-unit">
-          <h1>'Allo, 'Allo!</h1>
-          <p>You now have</p>
-          <ul>
-            <li>HTML5 Boilerplate</li>
-
-
-          </ul>
+        
+        <div class="container title">
+          <h4>gifstasher</h4>
+        </div>
+        <div class="container">
+          <form id="menu-form">
+            <input 
+              type="text" 
+              name="url" 
+              placeholder="Enter gif URL"
+              autocomplete="off">
+            <input 
+              type="text" 
+              name="title" 
+              placeholder="Enter gif title (optional)"
+              autocomplete="off">
+            <button type="submit">
+              Stash gif
+            </button>
+            <button id="clearGifs">
+              Unstash all gifs
+            </button>
+          </form>
         </div>
 
+        <ul id="menu"></ul>
 
         <!-- build:js scripts/vendor.js -->
         <!-- bower:js -->
