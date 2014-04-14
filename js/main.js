@@ -165,7 +165,7 @@ var Menu = (function () {
 		});
 
 		Utility.addEvent(optionsBtn, 'click', function () {
-			chrome.tabs.create({url: "options.html"});
+			chrome.tabs.create({url: 'options.html'});
 		});
 	}
 	
