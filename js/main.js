@@ -6,6 +6,8 @@ var Utility = (function () {
 		title: $('#flash-title'),
 		message: $('#flash-message'),
 		start: function (message,title,type) {
+			// figure out way to stop flashes from overlapping and queueing
+			// this.end();
 			this.message.text(message);
 			this.title.text(title);
 			this.el.addClass('alert-' + type);
