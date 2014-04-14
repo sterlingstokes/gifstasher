@@ -1,0 +1,220 @@
+body {
+  background: #fff;
+  font-size: 2em;
+  margin: 0 auto;
+  font-family: Arial, Helvetica, sans-serif;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  min-height: 400px;
+}
+
+header {
+  width: 600px;
+  padding-top: 5px;
+  border-bottom: 1px solid #ccc;
+}
+
+header h1 {
+  float: left;
+  margin: 0;
+  padding: 0;
+}
+
+.alert-popup {
+  width: 550px !important;
+}
+
+#stash {
+  display: none;
+  position: absolute;
+  top: 67px;
+  border: none;
+  box-shadow: 0px 2px 3px #ccc;
+  z-index: 1000;
+  padding: 10px;
+}
+
+#stash form input {
+  padding: 10px;
+  width: 187.5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  position: relative;
+  bottom: 1px;
+}
+
+#stash form button {
+  padding: 11px 10px;
+  width: 187px;
+  margin-bottom: 5px;
+}
+
+header nav {
+  float: right;
+}
+
+header nav li {
+  display: inline;
+  list-style-type: none;
+  width: 100%;
+  height: 100%;
+  font-size: 2em;
+  background: #fff;
+}
+
+header nav li:hover {
+  background: inherit;
+  color: #ccc;
+}
+
+button.close {
+  display: none;
+}
+
+table.table {
+  width: 500px;
+}
+
+form button:hover, ul li:hover {
+  background: #555;
+  cursor: pointer;
+}
+
+ul#menu {
+  padding: 0;
+  margin: 10px auto;
+  width: 600px;
+  padding-bottom: 5px;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+ul li.gif {
+  list-style: none;
+  display: inline-block;
+  margin-right: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+  color: #fff;
+  font-size: 0.5em;
+  width: 142px;
+  height: 142px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  position: relative;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+ul li .overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #000;
+  opacity: 0.8;
+  width: 100%;
+  height: 100%;
+}
+
+ul li .overlay input {
+  display: block;
+  margin: 0 auto;
+  padding: 10px;
+  color: #000;
+  font-size: 1.6em;
+}
+
+ul li .overlay button {
+  display: block;
+  padding: 10px;
+  margin: 10px auto;
+}
+
+.instructions {
+  width: 142px;
+  display: block;
+  font-size: 1.4em;
+  margin-top: 0;
+  padding: 10px;
+  font-size: 1.6em;
+  white-space: nowrap;
+  white-space: normal;
+}
+
+ul li.gif:hover .overlay {
+  display: block;
+}
+
+ul li:nth-child(4n) {
+  margin-right: 0;
+}
+
+ul li img {
+  width: 100%;
+  vertical-align: text-top;
+}
+
+#stash {
+  width: 600px;
+  margin: 0 auto;
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+  color: #222;
+  background: #000;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding-bottom: 5px;
+}
+
+#options {
+  border: none;
+  text-align: center;
+}
+
+#options table {
+  margin: 0 auto;
+  text-align: left;
+}
+
+#options table td:hover {
+  background: #eee;
+  cursor: pointer;
+}
+
+#options table th:hover {
+  background: inherit;
+  cursor: inherit;
+}
+
+.option-title {
+  margin-top: 7px;
+  display: inline-block;
+}
+
+#stash.title h4 {
+  margin-bottom: 5px;
+}
+
+#clearGifs {
+  background: red;
+  color: white;
+}
+
+#flash {
+  position: fixed;
+  top: 5px;
+  left: 5px;
+  padding: 10px;
+  margin: 0 10px;
+  width: 600px !important;
+}
