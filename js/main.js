@@ -43,6 +43,17 @@ var Menu = (function () {
 	if (localStorage.getItem('gifs')) {
 		gifs = JSON.parse(localStorage.getItem('gifs'));
 	}
+
+	Utility.addEvent(stashBtn, 'click', function () {
+		stash.toggle();
+		console.log(stash);
+		// focus input
+		$('#gif-url').focus();
+	});
+
+	Utility.addEvent(optionsBtn, 'click', function () {
+		chrome.tabs.create({url: 'options.html'});
+	});
 	
 	// append gif to menu
 	function appendGif(gif) {
@@ -156,17 +167,6 @@ var Menu = (function () {
 		for(var i = 0, len = gifs.length; i < len; i++){ appendGif(gifs[i]); }
 		Utility.addEvent(menuForm, 'submit', createGif);
 		Utility.addEvent(clear, 'click', clearGifs);
-
-		Utility.addEvent(stashBtn, 'click', function () {
-			stash.toggle();
-			console.log(stash);
-			// focus input
-			$('#gif-url').focus();
-		});
-
-		Utility.addEvent(optionsBtn, 'click', function () {
-			chrome.tabs.create({url: 'options.html'});
-		});
 	}
 	
 	return {

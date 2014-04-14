@@ -216,7 +216,7 @@ ul li img {
 
 #flash {
   position: fixed;
-  top: 5px;
+  bottom: 15px;
   left: 5px;
   padding: 10px;
   margin: 0 10px;
