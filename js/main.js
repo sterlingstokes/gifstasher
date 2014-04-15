@@ -105,7 +105,8 @@ var Menu = (function () {
 		li.appendChild(div);
 		li.appendChild(img);
 		li.appendChild(overlay);
-		el.appendChild(li);
+		$(el).prepend(li);
+		// el.appendChild(li);
 
 		Utility.addEvent(unstashBtn, 'click', function (e) {
 			removeGif(gif.id);
