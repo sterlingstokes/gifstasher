@@ -41,7 +41,7 @@ function stashGif(info) {
 				isFavorite: false
 			};
 
-			gifs.push(obj);
+			gifs.unshift(obj);
 			var gifsToStore = JSON.stringify(gifs);
 			localStorage.setItem('gifs', gifsToStore);
 

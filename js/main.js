@@ -186,7 +186,7 @@ var Menu = (function () {
 				tags: [],
 				isFavorite: false
 			};
-			gifs.push(obj);
+			gifs.unshift(obj);
 			gifsToStore = JSON.stringify(gifs);
 			localStorage.setItem('gifs', gifsToStore);
 			appendGif(obj);
