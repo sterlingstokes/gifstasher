@@ -49,6 +49,12 @@ var Menu = (function () {
 		e.stopPropagation();
 	});
 
+	$('#menu-form-modal').on('show.bs.modal',function (e) {
+		setTimeout(function () {
+			$('#gif-url').focus();
+		},500);
+	});
+
 	// append gif to menu
 	function appendGif(gif) {
 		var li = document.createElement('li');
@@ -123,7 +129,8 @@ var Menu = (function () {
 		Utility.addEvent(galleryImg, 'click', function (e) {
 			// close modal
 			gallery.modal('hide');
-		  e.stopPropagation();
+			$(galleryImg).remove();
+			e.stopPropagation();
 		});
 
 		Utility.addEvent(copyBtn, 'click', function () {
@@ -170,7 +177,7 @@ var Menu = (function () {
 		var filename = url.substring(url.lastIndexOf('/')+1);
 		var ext = filename.split('.').pop();
 
-		if ((formElements.url.value.length !== 0) && (ext === 'gif')) {
+		if ((formElements.url.value.length !== 0) && (ext === 'gif' || ext === 'jpg')) {
 			$('#no-gifs').hide();
 			var obj = {
 				id: Date.now(),
@@ -189,7 +196,7 @@ var Menu = (function () {
 			flash.start('Your gif has been stashed!','Woohoo!','success');
 			e.preventDefault();
 		} else {
-			if (ext !== 'gif') {
+			if (ext !== 'gif' || ext !== 'jpg') {
 				$('#menu-form-modal').modal('hide');
 				flash.start('There was a problem! Are you sure that it\'s a gif link?','Oh noes!','danger');
 			}
@@ -209,9 +216,12 @@ var Menu = (function () {
 		$(menuForm).bind('click',function (e) {
 			e.stopPropagation();
 		});
+		$('.cancel-btn').bind('click',function () {
+			$('.modal').modal('hide');
+		});
+		
 		Utility.addEvent(menuForm, 'submit', createGif);
 		Utility.addEvent(clear, 'click', clearGifs);
-		$('#stash-modal-btn').focus();
 	}
 	
 	return {

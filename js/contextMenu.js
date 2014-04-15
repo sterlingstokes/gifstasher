@@ -1,7 +1,3 @@
-// Copyright (c) 2010 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 'use strict';
 
 function preload(arr) {
@@ -19,30 +15,55 @@ if (localStorage.getItem('gifs')) {
 
 function stashGif(info) {
 	var url = JSON.stringify(info.srcUrl),
-			gifs;
+			filename = url.substring(url.lastIndexOf('/')+1),
+			ext = filename.split('.').pop(),
+			gifs,
+			notification;
 
-	chrome.runtime.sendMessage({}, function() {
-		if (localStorage.getItem('gifs')) {
-			gifs = JSON.parse(localStorage.getItem('gifs'));
-		} else {
-			gifs = [];
-		}
+	ext = ext.substring(0, ext.length - 1);
 
-		url = url.substring(1);
-		url = url.substring(0, url.length-1);
+	if (ext === 'gif' || ext === 'jpg') {
+		chrome.runtime.sendMessage({}, function() {
+			if (localStorage.getItem('gifs')) {
+				gifs = JSON.parse(localStorage.getItem('gifs'));
+			} else {
+				gifs = [];
+			}
 
-		var obj = {
-			id: Date.now(),
-			title: 'Untitled',
-			url: url,
-			tags: [],
-			isFavorite: false
-		};
+			url = url.substring(1);
+			url = url.substring(0, url.length-1);
 
-		gifs.push(obj);
-		var gifsToStore = JSON.stringify(gifs);
-		localStorage.setItem('gifs', gifsToStore);
-	});
+			var obj = {
+				id: Date.now(),
+				title: 'Untitled',
+				url: url,
+				tags: [],
+				isFavorite: false
+			};
+
+			gifs.push(obj);
+			var gifsToStore = JSON.stringify(gifs);
+			localStorage.setItem('gifs', gifsToStore);
+
+			notification = webkitNotifications.createNotification(
+			  'img/icon-small.png',
+			  'Gif stashed!',
+			  'Your gif has been saved to your Gif stash.'
+			);
+
+			notification.show();
+			setTimeout(function(){ notification.cancel(); }, 5000);
+		});
+	} else {
+		notification = webkitNotifications.createNotification(
+		  'img/icon-small-error.png',
+		  'Oh noes!',
+		  'There was an error stashing your gif. Are you sure that it\'s a gif?'
+		);
+
+		notification.show();
+		setTimeout(function(){ notification.cancel(); }, 15000);
+	}
 }
 
 chrome.contextMenus.create({

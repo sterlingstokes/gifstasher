@@ -24,5 +24,8 @@
     "scripts": [
       "js/contextMenu.js"
     ]
-  }
+  },
+  "web_accessible_resources": [
+    "img/icon-small.png"
+  ]
 }
