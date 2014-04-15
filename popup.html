@@ -19,11 +19,11 @@
           </li> -->
 
           <!-- plus icon -->
-          <li id="stash-btn">
+          <li id="stash-modal-btn" data-toggle="modal" data-target="#menu-form-modal">
             <i class="fa fa-plus"></i>
           </li>
 
-          <!-- trash icon -->
+          <!-- options icon -->
           <li id="options-btn">
             <i class="fa fa-cog"></i>
           </li>
@@ -36,33 +36,59 @@
       </nav>
       <span class="clearfix"></span>
     </header>
-  
-    <div id="stash">
-      <form id="menu-form">
-        <input 
-          type="text" 
-          name="url" 
-          placeholder="Enter gif URL"
-          autocomplete="off"
-          id="gif-url">
-        <input 
-          type="text" 
-          name="title" 
-          placeholder="Enter gif title (optional)"
-          autocomplete="off">
-        <button class="btn" type="submit">
-          Stash gif
-        </button>
-      </form>
-    </div>
 
     <ul id="menu"></ul>
 
-    <div class="alert alert-popup" id="flash">
-      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-      <strong><span id="flash-title"></span></strong> <span id="flash-message"></span>
+    <div id="no-gifs">
+      <h4>You have no gifs!</h4>
+      <p>
+        You can add gifs to your stash in a few ways:
+      </p>
+      <ul class="well">
+        <li>Right-click any gif from any site, and click "Stash this gif"</li>
+        <li>Click the <i class="fa fa-plus"></i> button in the top right of this window and enter in the url for the gif, along with an optional title.</li>
+      </ul>
     </div>
   </div>
+
+  <div class="modal fade" id="menu-form-modal" tabindex="-1" role="dialog" aria-labelledby="menu-form-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="menu-form">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="menu-form-modal-label">Stash gif</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="gif-url">Gif URL</label>
+              <input type="text" name="url" class="form-control" id="gif-url" placeholder="Enter gif URL">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button class="btn btn-primary" type="submit">Stash gif</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="gallery" tabindex="-1" role="dialog" aria-labelledby="galleryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content"></div>
+    </div>
+  </div>
+
+  <footer class="container">
+    <div id="flash-holder">
+      <div class="alert alert-popup" id="flash-template">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <strong><span class="flash-title"></span></strong> <span class="flash-message"></span>
+      </div>
+      <div id="copyright">&copy; 2014 Sterling Stokes.</div>
+    </div>
+  </footer>
 
   <script src="js/jquery.js"></script>
   <script src="js/bootstrap.min.js"></script>

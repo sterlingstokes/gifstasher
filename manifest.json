@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "gifstasher",
   "description": "Store your reaction gifs for quick and easy access!",
-  "version": "1.0",
+  "version": "1.0.2",
   "permissions": [
     "storage",
     "contextMenus",

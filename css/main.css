@@ -29,37 +29,16 @@ header h1 {
   width: 550px !important;
 }
 
-#stash {
-  display: none;
-  position: absolute;
-  top: 67px;
-  border: none;
-  box-shadow: 0px 2px 3px #ccc;
-  z-index: 1000;
-  padding: 10px;
-}
-
-#stash form input {
-  padding: 10px;
-  width: 187.5px;
-  margin-right: 5px;
-  margin-bottom: 5px;
-  border-radius: 4px;
+.alert {
   position: relative;
-  bottom: 1px;
-}
-
-#stash form button {
-  padding: 11px 10px;
-  width: 187px;
-  margin-bottom: 5px;
+  z-index: 1000;
 }
 
 header nav {
   float: right;
 }
 
-header nav li {
+header nav ul li {
   display: inline;
   list-style-type: none;
   width: 100%;
@@ -88,9 +67,12 @@ form button:hover, ul li:hover {
 
 ul#menu {
   padding: 0;
-  margin: 10px auto;
+  margin: 0 auto;
   margin-top: 70px;
+  margin-bottom: 70px;
   width: 600px;
+  height: 400px;
+  overflow-y: scroll;
   padding-bottom: 5px;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -100,8 +82,7 @@ ul li.gif {
   list-style: none;
   display: inline-block;
   margin-right: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
+  margin-bottom: 5px;
   text-align: center;
   color: #fff;
   font-size: 0.5em;
@@ -113,10 +94,6 @@ ul li.gif {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   position: relative;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
 }
 
 ul li .overlay {
@@ -130,29 +107,16 @@ ul li .overlay {
   height: 100%;
 }
 
+/* Hide input offscreen */
 ul li .overlay input {
-  display: block;
-  margin: 0 auto;
-  padding: 10px;
-  color: #000;
-  font-size: 1.6em;
+  position: absolute;
+  right: 300px;
 }
 
 ul li .overlay button {
   display: block;
-  padding: 10px;
-  margin: 10px auto;
-}
-
-.instructions {
-  width: 142px;
-  display: block;
-  font-size: 1.4em;
-  margin-top: 0;
-  padding: 10px;
-  font-size: 1.6em;
-  white-space: nowrap;
-  white-space: normal;
+  padding: 7px;
+  margin: 8px auto;
 }
 
 ul li.gif:hover .overlay {
@@ -163,21 +127,14 @@ ul li:nth-child(4n) {
   margin-right: 0;
 }
 
-ul li img {
-  width: 100%;
+ul li.gif img {
+  height: 100%;
+  overflow: hidden;
   vertical-align: text-top;
 }
 
-#stash {
-  width: 600px;
-  margin: 0 auto;
-  border-bottom: 1px solid #ccc;
-  padding: 10px;
-  color: #222;
-  background: #000;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  padding-bottom: 5px;
+ul li.gif button {
+  width: 122px;
 }
 
 #options {
@@ -205,20 +162,79 @@ ul li img {
   display: inline-block;
 }
 
-#stash.title h4 {
-  margin-bottom: 5px;
-}
-
 #clearGifs {
   background: red;
   color: white;
 }
 
+.flash {
+  margin-top: 10px;
+  width: 610px !important;
+  position: relative;
+}
+
+#flash-template {
+  display: none;
+}
+
 #flash {
   position: fixed;
-  bottom: 15px;
-  left: 5px;
-  padding: 10px;
-  margin: 0 10px;
-  width: 600px !important;
+  top: 20px;
+  right: 20px;
+}
+
+footer.container {
+  background: #fff;
+  height: 72px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 0 10px;
+}
+
+footer #copyright {
+  margin-bottom: 25px;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  bottom: 0;
+}
+
+#flash-holder {
+  border-top: 1px solid #ccc;
+  text-align: center;
+}
+
+#no-gifs {
+  position: absolute;
+  top: 60px;
+}
+
+#no-gifs ul.well {
+  padding: 13px 26px;
+  width: 600px;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#no-gifs ul li {
+  margin-bottom: 10px;
+}
+
+#no-gifs ul li:last-of-type {
+  margin-bottom: 0;
+}
+
+#no-gifs ul li:hover {
+  background: inherit;
+  cursor: inherit;
+}
+
+#gallery {
+  padding: 20px;
+}
+
+#gallery img {
+  width: 100%;
+  overflow-y: scroll;
 }

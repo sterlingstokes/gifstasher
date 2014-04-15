@@ -2,20 +2,19 @@
 
 var Utility = (function () {
 	var flash = {
-		el: $('#flash'),
-		title: $('#flash-title'),
-		message: $('#flash-message'),
-		start: function (message,title,type) {
-			// figure out way to stop flashes from overlapping and queueing
-			// this.end();
-			this.message.text(message);
-			this.title.text(title);
-			this.el.addClass('alert-' + type);
-			this.el.fadeIn('fast').delay(5000).fadeOut('fast');
-			this.el.addClass('alert-' + type);
+		start: function (message, title, type) {
+			this.end();
+			// clone flash-template
+			var flashElement = $('#flash-template').clone();
+			flashElement.addClass('flash').attr('id','');
+			if (type) { flashElement.addClass('alert-' + type); }
+			flashElement.find('.flash-message').text(message);
+			flashElement.find('.flash-title').text(title);
+			flashElement.appendTo('#flash-holder');
+			flashElement.fadeIn('fast').delay(5000).fadeOut('fast');
 		},
 		end: function () {
-			this.el.hide();
+			$('.flash').stop().remove();
 		}
 	};
 
@@ -31,32 +30,25 @@ var Utility = (function () {
 })();
 
 var Menu = (function () {
-	var clear = document.getElementById('clearGifs'),
+	var bg = chrome.extension.getBackgroundPage(),
+			clear = document.getElementById('clearGifs'),
 			gifs = [],
 			gifsToStore,
 			el = document.getElementById('menu'),
 			flash = Utility.flash,
 			menuForm = document.getElementById('menu-form'),
-			optionsBtn = document.getElementById('options-btn'),
-			stash = $('#stash'),
-			stashBtn = document.getElementById('stash-btn');
+			optionsBtn = document.getElementById('options-btn');
 	
 	// if gifs is in localStorage, get it out
 	if (localStorage.getItem('gifs')) {
 		gifs = JSON.parse(localStorage.getItem('gifs'));
 	}
 
-	Utility.addEvent(stashBtn, 'click', function () {
-		stash.toggle();
-		console.log(stash);
-		// focus input
-		$('#gif-url').focus();
+	Utility.addEvent(optionsBtn, 'click', function (e) {
+		chrome.tabs.create({url: 'options.html'});
+		e.stopPropagation();
 	});
 
-	Utility.addEvent(optionsBtn, 'click', function () {
-		chrome.tabs.create({url: 'options.html'});
-	});
-	
 	// append gif to menu
 	function appendGif(gif) {
 		var li = document.createElement('li');
@@ -67,26 +59,39 @@ var Menu = (function () {
 		
 		var overlay = document.createElement('div');
 		overlay.className = 'overlay';
-		
-		var removeBtn = document.createElement('button');
-		removeBtn.setAttribute('type','button');
-		removeBtn.className = 'btn';
-		var removeTxt = document.createTextNode('Unstash Gif');
-		removeBtn.appendChild(removeTxt);
 
+		// copy
+		var viewBtn = document.createElement('button');
+		viewBtn.setAttribute('type','button');
+		viewBtn.className = 'btn btn-info';
+		var viewTxt = document.createTextNode('View Gif');
+		viewBtn.appendChild(viewTxt);
+
+		// copy
+		var copyBtn = document.createElement('button');
+		copyBtn.setAttribute('type','button');
+		copyBtn.className = 'btn btn-success copy-btn';
+		var copyTxt = document.createTextNode('Copy Link');
+		copyBtn.appendChild(copyTxt);
+
+		// unstash
+		var unstashBtn = document.createElement('button');
+		unstashBtn.setAttribute('type','button');
+		unstashBtn.setAttribute('data-toggle','modal');
+		unstashBtn.setAttribute('data-target','#removeModal');
+		unstashBtn.className = 'btn btn-danger';
+		var removeTxt = document.createTextNode('Unstash Gif');
+		unstashBtn.appendChild(removeTxt);
+
+		// input -- hide behind copy button
 		var input = document.createElement('input');
 		input.setAttribute('type', 'text');
 		input.setAttribute('value', gif.url);
-		
-		var instructions = document.createElement('div');
-		instructions.className = 'instructions';
 
-		var txt = document.createTextNode('Click to copy gif link');
-		instructions.appendChild(txt);
-		
-		overlay.appendChild(instructions);
 		overlay.appendChild(input);
-		overlay.appendChild(removeBtn);
+		overlay.appendChild(viewBtn);
+		overlay.appendChild(copyBtn);
+		overlay.appendChild(unstashBtn);
 		
 		var img = document.createElement('img');
 		img.src = gif.url;
@@ -96,14 +101,32 @@ var Menu = (function () {
 		li.appendChild(overlay);
 		el.appendChild(li);
 
-		Utility.addEvent(removeBtn, 'click', function (e) {
+		Utility.addEvent(unstashBtn, 'click', function (e) {
 			removeGif(gif.id);
-			flash.end();
-			flash.start('Your gif has been removed.','BOOM!','success');
+			flash.start('Your gif has been removed.','BOOM!','danger');
 			e.stopPropagation();
 		});
 
-		Utility.addEvent(li, 'click', function () {
+		// for viewing in gallery
+		var galleryImg = document.createElement('img');
+		galleryImg.src = gif.url;
+		var gallery = $('#gallery');
+		var content = gallery.find('.modal-content');
+
+		Utility.addEvent(viewBtn, 'click', function (e) {
+			content.html('');
+			content.append(galleryImg);
+			gallery.modal('show');
+			e.stopPropagation();
+		});
+
+		Utility.addEvent(galleryImg, 'click', function (e) {
+			// close modal
+			gallery.modal('hide');
+		  e.stopPropagation();
+		});
+
+		Utility.addEvent(copyBtn, 'click', function () {
 			input.select();
 			input.focus();
 			document.execCommand('SelectAll');
@@ -114,8 +137,6 @@ var Menu = (function () {
 
 	function removeGif(id, e) {
 		// find li with data id
-
-		chrome.extension.getBackgroundPage().console.log(id);
 		$('li[data-id="' + id + '"]').remove();
 
 		// remove from gifs and save gifs in localStorage
@@ -125,6 +146,8 @@ var Menu = (function () {
 				return false;
 			}
 		});
+
+		if (gifs.length === 0) { $('#no-gifs').show(); }
 
 		gifsToStore = JSON.stringify(gifs);
 		localStorage.setItem('gifs', gifsToStore);
@@ -142,23 +165,34 @@ var Menu = (function () {
 	// create gif and append to gifs
 	function createGif(e) {
 		var formElements = document.getElementById('menu-form').elements;
-		if (formElements.url.value.length !== 0) {
+
+		var url = formElements.url.value;
+		var filename = url.substring(url.lastIndexOf('/')+1);
+		var ext = filename.split('.').pop();
+
+		if ((formElements.url.value.length !== 0) && (ext === 'gif')) {
+			$('#no-gifs').hide();
 			var obj = {
 				id: Date.now(),
-				title: (formElements.title.value !== '') ? formElements.title.value : 'Untitled',
-				url: formElements.url.value
+				title: '',
+				url: formElements.url.value,
+				tags: [],
+				isFavorite: false
 			};
 			gifs.push(obj);
 			gifsToStore = JSON.stringify(gifs);
 			localStorage.setItem('gifs', gifsToStore);
 			appendGif(obj);
-			formElements.title.value = '';
 			formElements.url.value = '';
 			formElements.url.focus();
+			$('#menu-form-modal').modal('hide');
 			flash.start('Your gif has been stashed!','Woohoo!','success');
-			$('#stash').slideUp("fast");
 			e.preventDefault();
 		} else {
+			if (ext !== 'gif') {
+				$('#menu-form-modal').modal('hide');
+				flash.start('There was a problem! Are you sure that it\'s a gif link?','Oh noes!','danger');
+			}
 			e.preventDefault();
 			return false;
 		}
@@ -166,9 +200,18 @@ var Menu = (function () {
 	
 	// initial menu setup
 	function init(){
-		for(var i = 0, len = gifs.length; i < len; i++){ appendGif(gifs[i]); }
+		if (gifs.length === 0) {
+			$('#no-gifs').show();
+		} else {
+			$('#no-gifs').hide();
+			for(var i = 0, len = gifs.length; i < len; i++){ appendGif(gifs[i]); }
+		}
+		$(menuForm).bind('click',function (e) {
+			e.stopPropagation();
+		});
 		Utility.addEvent(menuForm, 'submit', createGif);
 		Utility.addEvent(clear, 'click', clearGifs);
+		$('#stash-modal-btn').focus();
 	}
 	
 	return {

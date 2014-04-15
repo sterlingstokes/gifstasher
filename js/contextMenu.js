@@ -4,6 +4,19 @@
 
 'use strict';
 
+function preload(arr) {
+	var images = [];
+	for (var i = 0; i < arr.length; i++) {
+		images[i] = new Image();
+		images[i].src = arr[i].url;
+	}
+}
+
+if (localStorage.getItem('gifs')) {
+	var gifs = JSON.parse(localStorage.getItem('gifs'));
+	preload(gifs);
+}
+
 function stashGif(info) {
 	var url = JSON.stringify(info.srcUrl),
 			gifs;
@@ -21,7 +34,9 @@ function stashGif(info) {
 		var obj = {
 			id: Date.now(),
 			title: 'Untitled',
-			url: url
+			url: url,
+			tags: [],
+			isFavorite: false
 		};
 
 		gifs.push(obj);

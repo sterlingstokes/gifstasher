@@ -9,7 +9,7 @@ var Utility = (function () {
 			this.message.text(message);
 			this.title.text(title);
 			this.el.addClass('alert-' + type);
-			this.el.fadeIn('fast').delay(5000).fadeOut('fast');
+			this.el.fadeIn('fast').delay(3000).fadeOut('fast');
 			this.el.addClass('alert-' + type);
 		}
 	};
@@ -38,6 +38,9 @@ var Options = (function () {
 	// initial options setup
 	function init(){
 		Utility.addEvent(clear, 'click', clearGifs);
+		$('#email-btn').bind('click', function () {
+			window.location.href = 'mailto:gifstasher@gmail.com?subject=Gifstasher%20Feedback';
+		});
 	}
 	
 	return {
