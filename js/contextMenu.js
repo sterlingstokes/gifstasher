@@ -46,9 +46,9 @@ function stashGif(info) {
 			localStorage.setItem('gifs', gifsToStore);
 
 			notification = webkitNotifications.createNotification(
-			  'img/icon-small.png',
-			  'Gif stashed!',
-			  'Your gif has been saved to your Gif stash.'
+				'img/icon-small.png',
+				'Gif stashed!',
+				'Your gif has been saved to your Gif stash.'
 			);
 
 			notification.show();
@@ -56,9 +56,9 @@ function stashGif(info) {
 		});
 	} else {
 		notification = webkitNotifications.createNotification(
-		  'img/icon-small-error.png',
-		  'Oh noes!',
-		  'There was an error stashing your gif. Are you sure that it\'s a gif?'
+			'img/icon-small-error.png',
+			'Oh noes!',
+			'There was an error stashing your gif. Are you sure that it\'s a gif?'
 		);
 
 		notification.show();
