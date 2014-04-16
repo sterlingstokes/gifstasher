@@ -36,7 +36,7 @@ var Menu = (function () {
 			gifsToStore,
 			el = document.getElementById('menu'),
 			flash = Utility.flash,
-			loadCount,
+			loadLimit = 15, // by index, for gifs array
 			menuForm = document.getElementById('menu-form'),
 			optionsBtn = document.getElementById('options-btn');
 	
@@ -213,7 +213,7 @@ var Menu = (function () {
 		} else {
 			$('#no-gifs').hide();
 
-			for(var i = 0, len = gifs.length; i < len; i++){
+			for(var i = 0; i < loadLimit && i <= gifs.length; i++){
 				appendGif(gifs[i]);
 			}
 		}
@@ -229,12 +229,17 @@ var Menu = (function () {
 		var menuBox = $('#menu');
 
 		menuBox.bind('scroll', function() {
-			if($(window).scrollTop() == $(document).height() - $(window).height())
-				{
-					// show loader
-					var loader = $('<li class=\'loader-gif\'><img src=\'img/loader.gif\' alt=\'Loading more gifs\'/></li>').appendTo(menuBox);
+			if($(window).scrollTop() == $(document).height() - $(window).height()){
+				if (loadLimit < gifs.length) {
 					// load the next 16 gifs
-		    }
+					var oldLoadLimit = loadLimit;
+					loadLimit = loadLimit + 16;
+					for(var i = oldLoadLimit; i < loadLimit && i <= gifs.length; i++){
+						appendGif(gifs[i]);
+					}
+				}
+				bg.console.log(loadLimit, gifs.length);
+			}
 		});
 		
 		Utility.addEvent(menuForm, 'submit', createGif);
