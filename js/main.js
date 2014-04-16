@@ -36,6 +36,7 @@ var Menu = (function () {
 			gifsToStore,
 			el = document.getElementById('menu'),
 			flash = Utility.flash,
+			loadCount,
 			menuForm = document.getElementById('menu-form'),
 			optionsBtn = document.getElementById('options-btn');
 	
@@ -211,13 +212,29 @@ var Menu = (function () {
 			$('#no-gifs').show();
 		} else {
 			$('#no-gifs').hide();
-			for(var i = 0, len = gifs.length; i < len; i++){ appendGif(gifs[i]); }
+
+			for(var i = 0, len = gifs.length; i < len; i++){
+				appendGif(gifs[i]);
+			}
 		}
+		
 		$(menuForm).bind('click',function (e) {
 			e.stopPropagation();
 		});
+
 		$('.cancel-btn').bind('click',function () {
 			$('.modal').modal('hide');
+		});
+
+		var menuBox = $('#menu');
+
+		menuBox.bind('scroll', function() {
+			if($(window).scrollTop() == $(document).height() - $(window).height())
+				{
+					// show loader
+					var loader = $('<li class=\'loader-gif\'><img src=\'img/loader.gif\' alt=\'Loading more gifs\'/></li>').appendTo(menuBox);
+					// load the next 16 gifs
+		    }
 		});
 		
 		Utility.addEvent(menuForm, 'submit', createGif);
@@ -231,4 +248,6 @@ var Menu = (function () {
 	};
 })();
 
-window.onload = Menu.init();
+$(document).ready(function () {
+	Menu.init();
+});

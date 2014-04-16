@@ -48,4 +48,6 @@ var Options = (function () {
 	};
 })();
 
-window.onload = Options.init();
+$(document).ready(function () {
+	Options.init();
+});
