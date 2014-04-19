@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <head>
     <meta charset="utf-8">
     <title>gifstasher</title>
-    <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
   <div class="container">
@@ -12,7 +12,7 @@
       <img src="img/icon-small.png" alt="gifstasher">
       <nav>
         <ul>
-          <li id="stash-modal-btn" data-toggle="modal" data-target="#gallery-form-modal">
+          <li class="stash-modal-btn" data-toggle="modal" data-target="#gallery-form-modal">
             <i class="fa fa-plus"></i>
           </li>
 
@@ -28,11 +28,17 @@
 
     <div id="no-gifs">
       <h4>You have no gifs!</h4>
+      <button class="btn btn-lg btn-primary stash-modal-btn" data-toggle="modal" data-target="#gallery-form-modal">
+        <i class="fa fa-plus"></i> Add a gif now!
+      </button>
       <p>
         You can add gifs to your stash in a few ways:
       </p>
       <ul class="well">
-        <li>Right-click any gif from any site, and click "Stash this gif"</li>
+        <li>
+          <div>Right-click any gif from any site, and click "Stash this gif"</div>
+          <img src="img/context-menu.jpg" alt="Right-click to stash from the context menu">
+        </li>
         <li>Click the <i class="fa fa-plus"></i> button in the top right of this window and enter in the url for the gif.</li>
       </ul>
     </div>

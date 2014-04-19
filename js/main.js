@@ -7,6 +7,7 @@
  */
 
 (function (window, document, $) {
+
 	'use strict';
 
 	// utility module
@@ -49,10 +50,14 @@
 			addEvent: addEvent,
 			flash: flash
 		};
+
 	}());
 
 	// Stasher module
 	var Stasher = (function () {
+
+		// Properties
+
 		var bg = chrome.extension.getBackgroundPage(),							// store background page for logging
 				gifs = [],																							// array for holding gifs
 				gifsToStore,																						// for holding stringified gifs array
@@ -61,24 +66,8 @@
 				loadLimit = 15,																					// loading limit, by index, for infinite scroll
 				galleryForm = document.getElementById('gallery-form'),	// gallery form
 				optionsBtn = document.getElementById('options-btn');
-		
-		// if gifs array is stored in localStorage, retrieve and parse
-		if (localStorage.getItem('gifs')) { gifs = JSON.parse(localStorage.getItem('gifs')); }
 
-		// add listener for options button
-		Utility.addEvent(optionsBtn, 'click', function (e) {
-
-			chrome.tabs.create({url: 'options.html'});	// open options in new tab
-			e.stopPropagation();												// stop click from propagating
-
-		});
-
-		// when Bootstrap modal is shown, focus on gif url input
-		$('#gallery-form-modal').on('show.bs.modal',function (e) {
-
-			setTimeout(function () { $('#gif-url').focus(); },500);
-
-		});
+		// Methods
 
 		// append gif to gallery
 		function appendGif(gif, placement) {
@@ -174,6 +163,7 @@
 				gallery.modal('hide');		// close modal
 				$(galleryImg).remove();		// remove and unbind gallery view image element
 				e.stopPropagation();			// stop the click from propagating
+
 			});
 
 			// add listener for clicking copy button
@@ -186,35 +176,11 @@
 
 				// show success alert
 				flash.start('The link has been copied to your clipboard. Paste away!','Yay!','success');
+
 			});
 
 		}
 
-		// remove gif from the gallery
-		function removeGif(id, e) {
-			
-			// find li with data id and remove the element and all bound events
-			$('li[data-id="' + id + '"]').remove();
-
-			// loop through gifs array
-			$.each(gifs, function (i) {
-
-				// if the gif id matches, remove it 
-				if(gifs[i].id === id) {
-					gifs.splice(i,1);
-					return false;
-				}
-
-			});
-
-			// if the gifs array is empty, show the no-gifs element
-			if (gifs.length === 0) { $('#no-gifs').show(); }
-
-			// store gifs in localStorage
-			gifsToStore = JSON.stringify(gifs);					// stringify gifs array
-			localStorage.setItem('gifs', gifsToStore);	// store gifs in localStorage
-		}
-		
 		// create new gif from gallery form and append to gifs
 		function createGif(e) {
 
@@ -242,8 +208,7 @@
 				localStorage.setItem('gifs', gifsToStore);	// store gifs in localStorage
 				formElements.url.value = '';								// reset value of url input
 				formElements.url.focus();										// reset focus to url input
-				appendGif(gif, prepend);										// append gif to gallery
-
+				
 				// hide no-gif element if it exists
 				if ($('#no-gifs').is(':visible')) {
 					$('#no-gifs').hide();
@@ -256,6 +221,8 @@
 				flash.start('Your gif has been stashed!','Woohoo!','success');
 				
 				e.stopPropagation();	// stop click from propagating
+
+				appendGif(gif, prepend);	// append gif to gallery
 
 			} else {
 
@@ -271,47 +238,109 @@
 				}
 
 				e.stopPropagation();	// stop the click from propagating
-				return false;					// 
-				
+				return false;					// stop the form from submitting
+
 			}
 
 			e.preventDefault();
 		}
-		
+
+		// retrieve gifs from storage
+		function getStoredGifs () {
+			// if gifs array is stored in localStorage, retrieve and parse
+			if (localStorage.getItem('gifs')) {
+				return JSON.parse(localStorage.getItem('gifs'));
+			}
+
+		}
+
 		// initial gallery setup
 		function init(){
-			if (gifs.length === 0) {
-				$('#no-gifs').show();
-			} else {
-				$('#no-gifs').hide();
 
-				for(var i = 0; i < loadLimit && i <= (gifs.length - 1); i++){
+			// if gifs array is stored in localStorage, retrieve and parse
+			gifs = getStoredGifs();
+
+			// load gifs or show no-gif element
+			if (gifs.length === 0) {
+				$('#no-gifs').show();	// show no-gifs element
+			} else {
+				$('#no-gifs').hide();	// hide no-gifs element
+
+				// loop through gifs and append to gallery
+				for(var i = 0, len = gifs.length; i < loadLimit && i <= (len - 1); i++){
 					appendGif(gifs[i]);
 				}
 			}
 
-			$('.cancel-btn').bind('click',function () {
-				$('.modal').modal('hide');
-			});
+			var galleryView = $('#gallery-view');	// store gallery view element
 
-			var galleryView = $('#gallery-view');
-
+			// bind scroll to gallery view element
 			galleryView.bind('scroll', function() {
 
+				// if user scrolls to bottom of window
 				if($(window).scrollTop() == $(document).height() - $(window).height()){
+
+					// load next 16 gifs
 					if (loadLimit < gifs.length) {
-						// load next 16 gifs
-						var oldLoadLimit = loadLimit;
-						loadLimit = loadLimit + 16;
+						
+						var oldLoadLimit = loadLimit;	// store old load limit for counter
+						loadLimit = loadLimit + 16;		// increment load limit
+
+						// loop through and append gifs to gallery
 						for(var i = oldLoadLimit; i < loadLimit && i <= gifs.length; i++){
 							appendGif(gifs[i]);
 						}
 					}
+
 				}
 
 			});
+
+			// bind the cancel button to the click
+			$('.cancel-btn').bind('click',function () {
+				$('.modal').modal('hide');
+			});
 			
-			Utility.addEvent(galleryForm, 'submit', createGif);	// add listener for submit button on gallery form
+			// add listener for submit button on gallery form
+			Utility.addEvent(galleryForm, 'submit', createGif);
+
+			// add listener for options button
+			Utility.addEvent(optionsBtn, 'click', function (e) {
+
+				chrome.tabs.create({url: 'options.html'});	// open options in new tab
+				e.stopPropagation();												// stop click from propagating
+
+			});
+
+			// when Bootstrap modal is shown, focus on gif url input
+			$('#gallery-form-modal').on('show.bs.modal',function (e) {
+				setTimeout(function () { $('#gif-url').focus(); },500);
+			});
+		}
+
+		// remove gif from the gallery
+		function removeGif(id, e) {
+			
+			// find li with data id and remove the element and all bound events
+			$('li[data-id="' + id + '"]').remove();
+
+			// loop through gifs array
+			$.each(gifs, function (i) {
+
+				// if the gif id matches, remove it 
+				if(gifs[i].id === id) {
+					gifs.splice(i,1);
+					return false;
+				}
+
+			});
+
+			// if the gifs array is empty, show the no-gifs element
+			if (gifs.length === 0) { $('#no-gifs').show(); }
+
+			// store gifs in localStorage
+			gifsToStore = JSON.stringify(gifs);					// stringify gifs array
+			localStorage.setItem('gifs', gifsToStore);	// store gifs in localStorage
 		}
 		
 		return {
