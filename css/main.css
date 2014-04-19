@@ -68,7 +68,7 @@ form button:hover, ul li:hover {
   cursor: pointer;
 }
 
-ul#menu {
+ul#gallery {
   padding: 0;
   margin: 0 auto;
   margin-top: 70px;
@@ -238,7 +238,8 @@ footer #copyright {
   padding: 20px;
 }
 
-#gallery img {
+#gallery-view img {
   width: 100%;
   overflow-y: scroll;
+  border: 3px solid #222;
 }

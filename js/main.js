@@ -1,258 +1,328 @@
-'use strict';
+/*!
+ * gifstasher 1.0.5
+ * https://chrome.google.com/webstore/detail/gifstasher/enegbanenghjkfmmkjimbckfihbamcfi
+ *
+ * Copyright 2014 Sterling Stokes
+ * Date: April 17th, 2014
+ */
 
-var Utility = (function () {
-	var flash = {
-		start: function (message, title, type) {
-			this.end();
-			// clone flash-template
-			var flashElement = $('#flash-template').clone();
-			flashElement.addClass('flash').attr('id','');
-			if (type) { flashElement.addClass('alert-' + type); }
-			flashElement.find('.flash-message').text(message);
-			flashElement.find('.flash-title').text(title);
-			flashElement.appendTo('#flash-holder');
-			flashElement.fadeIn('fast').delay(5000).fadeOut('fast');
-		},
-		end: function () {
-			$('.flash').stop().remove();
-		}
-	};
+(function (window, document, $) {
+	'use strict';
 
-	function addEvent(element, evnt, funct) {
-		if (element.attachEvent) { return element.attachEvent('on' + evnt, funct); }
-		else { return element.addEventListener(evnt, funct, false); }
-	}
+	// utility module
+	var Utility = (function () {
 
-	return {
-		addEvent: addEvent,
-		flash: flash
-	};
-})();
+		// flash message at bottom of gifstasher window
+		var flash = {
 
-var Menu = (function () {
-	var bg = chrome.extension.getBackgroundPage(),
-			clear = document.getElementById('clearGifs'),
-			gifs = [],
-			gifsToStore,
-			el = document.getElementById('menu'),
-			flash = Utility.flash,
-			loadLimit = 15, // by index, for gifs array
-			menuForm = document.getElementById('menu-form'),
-			optionsBtn = document.getElementById('options-btn');
-	
-	// if gifs is in localStorage, get it out
-	if (localStorage.getItem('gifs')) {
-		gifs = JSON.parse(localStorage.getItem('gifs'));
-	}
+			// start flash
+			start: function (message, title, type) {
 
-	Utility.addEvent(optionsBtn, 'click', function (e) {
-		chrome.tabs.create({url: 'options.html'});
-		e.stopPropagation();
-	});
+				this.end();
+				var flashElement = $('#flash-template').clone();						// clone flash-template
+				flashElement.addClass('flash').attr('id','');								// add flash class and remove template id
+				if (type) { flashElement.addClass('alert-' + type); }				// if a different alert type, add that class
+				flashElement.find('.flash-message').text(message);					// insert message into div
+				flashElement.find('.flash-title').text(title);							// insert title into div
+				flashElement.appendTo('#flash-holder');											// append flash to holder
+				flashElement.fadeIn('fast').delay(5000).fadeOut('fast');		// show and fade out
 
-	$('#menu-form-modal').on('show.bs.modal',function (e) {
-		setTimeout(function () {
-			$('#gif-url').focus();
-		},500);
-	});
+			},
 
-	// append gif to menu
-	function appendGif(gif) {
-		var li = document.createElement('li');
-		li.className = 'gif';
-		li.dataset.id = gif.id;
+			// end flash
+			end: function () {
 
-		var div = document.createElement('div');
-		
-		var overlay = document.createElement('div');
-		overlay.className = 'overlay';
+				$('.flash').stop().remove();	// stop animation and remove from DOM
 
-		// copy
-		var viewBtn = document.createElement('button');
-		viewBtn.setAttribute('type','button');
-		viewBtn.className = 'btn btn-info';
-		var viewTxt = document.createTextNode('View Gif');
-		viewBtn.appendChild(viewTxt);
-
-		// copy
-		var copyBtn = document.createElement('button');
-		copyBtn.setAttribute('type','button');
-		copyBtn.className = 'btn btn-success copy-btn';
-		var copyTxt = document.createTextNode('Copy Link');
-		copyBtn.appendChild(copyTxt);
-
-		// unstash
-		var unstashBtn = document.createElement('button');
-		unstashBtn.setAttribute('type','button');
-		unstashBtn.setAttribute('data-toggle','modal');
-		unstashBtn.setAttribute('data-target','#removeModal');
-		unstashBtn.className = 'btn btn-danger';
-		var removeTxt = document.createTextNode('Unstash Gif');
-		unstashBtn.appendChild(removeTxt);
-
-		// input -- hide behind copy button
-		var input = document.createElement('input');
-		input.setAttribute('type', 'text');
-		input.setAttribute('value', gif.url);
-
-		overlay.appendChild(input);
-		overlay.appendChild(viewBtn);
-		overlay.appendChild(copyBtn);
-		overlay.appendChild(unstashBtn);
-		
-		var img = document.createElement('img');
-		img.src = gif.url;
-		
-		li.appendChild(div);
-		li.appendChild(img);
-		li.appendChild(overlay);
-		el.appendChild(li);
-
-		Utility.addEvent(unstashBtn, 'click', function (e) {
-			removeGif(gif.id);
-			flash.start('Your gif has been removed.','BOOM!','danger');
-			e.stopPropagation();
-		});
-
-		// for viewing in gallery
-		var galleryImg = document.createElement('img');
-		galleryImg.src = gif.url;
-		var gallery = $('#gallery');
-		var content = gallery.find('.modal-content');
-
-		Utility.addEvent(viewBtn, 'click', function (e) {
-			content.html('');
-			content.append(galleryImg);
-			gallery.modal('show');
-			e.stopPropagation();
-		});
-
-		Utility.addEvent(galleryImg, 'click', function (e) {
-			// close modal
-			gallery.modal('hide');
-			$(galleryImg).remove();
-			e.stopPropagation();
-		});
-
-		Utility.addEvent(copyBtn, 'click', function () {
-			input.select();
-			input.focus();
-			document.execCommand('SelectAll');
-			document.execCommand('Copy', false, null);
-			flash.start('The link has been copied to your clipboard. Paste away!','Yay!','success');
-		});
-	}
-
-	function removeGif(id, e) {
-		// find li with data id
-		$('li[data-id="' + id + '"]').remove();
-
-		// remove from gifs and save gifs in localStorage
-		$.each(gifs, function(i){
-			if(gifs[i].id === id) {
-				gifs.splice(i,1);
-				return false;
 			}
+		};
+
+		// add event function
+		function addEvent(element, evnt, funct) {
+
+			if (element.attachEvent) { return element.attachEvent('on' + evnt, funct); }	// below IE 11
+			else { return element.addEventListener(evnt, funct, false); }									// everything else
+
+		}
+
+		return {
+			addEvent: addEvent,
+			flash: flash
+		};
+	}());
+
+	// Stasher module
+	var Stasher = (function () {
+		var bg = chrome.extension.getBackgroundPage(),							// store background page for logging
+				gifs = [],																							// array for holding gifs
+				gifsToStore,																						// for holding stringified gifs array
+				el = document.getElementById('gallery'),								// get gallery unordered list
+				flash = Utility.flash,																	// store local copy of flash
+				loadLimit = 15,																					// loading limit, by index, for infinite scroll
+				galleryForm = document.getElementById('gallery-form'),	// gallery form
+				optionsBtn = document.getElementById('options-btn');
+		
+		// if gifs array is stored in localStorage, retrieve and parse
+		if (localStorage.getItem('gifs')) { gifs = JSON.parse(localStorage.getItem('gifs')); }
+
+		// add listener for options button
+		Utility.addEvent(optionsBtn, 'click', function (e) {
+
+			chrome.tabs.create({url: 'options.html'});	// open options in new tab
+			e.stopPropagation();												// stop click from propagating
+
 		});
 
-		if (gifs.length === 0) { $('#no-gifs').show(); }
+		// when Bootstrap modal is shown, focus on gif url input
+		$('#gallery-form-modal').on('show.bs.modal',function (e) {
 
-		gifsToStore = JSON.stringify(gifs);
-		localStorage.setItem('gifs', gifsToStore);
-	}
+			setTimeout(function () { $('#gif-url').focus(); },500);
 
-	// clear all gifs in local storage
-	function clearGifs () {
-		localStorage.removeItem('gifs');
-		gifs = [];
-		var elements = el.getElementsByTagName('li');
-		for (var i = 0, len = elements.length; i < len; i++) { elements[i].onclick = null; }
-		while (el.firstChild) { el.removeChild(el.firstChild); }
-	}
-	
-	// create gif and append to gifs
-	function createGif(e) {
-		var formElements = document.getElementById('menu-form').elements;
+		});
 
-		var url = formElements.url.value;
-		var filename = url.substring(url.lastIndexOf('/')+1);
-		var ext = filename.split('.').pop();
+		// append gif to gallery
+		function appendGif(gif, placement) {
 
-		if ((formElements.url.value.length !== 0) && (ext === 'gif' || ext === 'jpg')) {
-			$('#no-gifs').hide();
-			var obj = {
-				id: Date.now(),
-				title: '',
-				url: formElements.url.value,
-				tags: [],
-				isFavorite: false
-			};
-			gifs.unshift(obj);
-			gifsToStore = JSON.stringify(gifs);
-			localStorage.setItem('gifs', gifsToStore);
-			appendGif(obj);
-			formElements.url.value = '';
-			formElements.url.focus();
-			$('#menu-form-modal').modal('hide');
-			flash.start('Your gif has been stashed!','Woohoo!','success');
+			// image holder
+			var imgHolder = document.createElement('li');		// create li element
+			imgHolder.className = 'gif';										// add .gif class
+			imgHolder.dataset.id = gif.id;									// add data-id to li
+			
+			// overlay div
+			var overlay = document.createElement('div');	// create div element
+			overlay.className = 'overlay';								// add .overlay class
+
+			// view button
+			var viewBtn = document.createElement('button');			// create button element
+			viewBtn.setAttribute('type','button');							// set type attribute
+			viewBtn.className = 'btn btn-info';									// add bootstrap classes
+			var viewTxt = document.createTextNode('View Gif');	// create text node
+			viewBtn.appendChild(viewTxt);												// append text node
+
+			// copy button
+			var copyBtn = document.createElement('button');			// create button element
+			copyBtn.setAttribute('type','button');							// set type attribute
+			copyBtn.className = 'btn btn-success copy-btn';			// add bootstrap and .copy-btn classes
+			var copyTxt = document.createTextNode('Copy Link');	// create text node
+			copyBtn.appendChild(copyTxt);												// append text node
+
+			// unstash button
+			var unstashBtn = document.createElement('button');			// create button element
+			unstashBtn.setAttribute('type','button');								// set type attribute
+			unstashBtn.setAttribute('data-toggle','modal');					// set data-toggle for modal
+			unstashBtn.setAttribute('data-target','#removeModal');	// set data-target to remove id
+			unstashBtn.className = 'btn btn-danger';								// add bootstrap classes
+			var removeTxt = document.createTextNode('Unstash Gif');	// create text node
+			unstashBtn.appendChild(removeTxt);											// append text node
+
+			// input (hidden behind copy button)
+			var input = document.createElement('input');	// create input element
+			input.setAttribute('type', 'text');						// set type attribute
+			input.setAttribute('value', gif.url);					// set value attribute to gif url
+
+			// the gif element
+			var img = document.createElement('img');	// create image element
+			img.src = gif.url;												// set source for gif
+
+			// the gallery view element
+			var galleryImg = document.createElement('img');	// create gallery image element
+			galleryImg.src = gif.url;												// set source for gif
+			var gallery = $('#gallery-view');									// store jquery gallery element
+			var content = gallery.find('.modal-content');	// store modal content element
+
+			// append all the things to the overlay
+			overlay.appendChild(input);
+			overlay.appendChild(viewBtn);
+			overlay.appendChild(copyBtn);
+			overlay.appendChild(unstashBtn);
+			
+			// append all the things to the image holder
+			imgHolder.appendChild(img);
+			imgHolder.appendChild(overlay);
+
+			// append the image holder to the gallery
+			if (placement === 'prepend') {
+				$(el).prepend(imgHolder);
+			} else {
+				el.appendChild(imgHolder);
+			}
+
+			// add listener for unstash button
+			Utility.addEvent(unstashBtn, 'click', function (e) {
+
+				removeGif(gif.id);		// remove gif
+				e.stopPropagation();	// stop click from propagating
+
+				// show success alert
+				flash.start('Your gif has been removed.','BOOM!','success');
+
+			});
+
+			// add listener for view button
+			Utility.addEvent(viewBtn, 'click', function (e) {
+
+				content.html('');						// remove any previous modal content
+				content.append(galleryImg);	// append the gallery image
+				gallery.modal('show');			// show the gallery view modal
+				e.stopPropagation();				// stop the click from propagating
+
+			});
+
+			// add listener for clicking the gallery view image
+			Utility.addEvent(galleryImg, 'click', function (e) {
+
+				gallery.modal('hide');		// close modal
+				$(galleryImg).remove();		// remove and unbind gallery view image element
+				e.stopPropagation();			// stop the click from propagating
+			});
+
+			// add listener for clicking copy button
+			Utility.addEvent(copyBtn, 'click', function () {
+
+				input.select();															// select url in input
+				input.focus();															// focus input element
+				document.execCommand('SelectAll');					// select all text in chrome
+				document.execCommand('Copy', false, null);	// copy text to clipboard
+
+				// show success alert
+				flash.start('The link has been copied to your clipboard. Paste away!','Yay!','success');
+			});
+
+		}
+
+		// remove gif from the gallery
+		function removeGif(id, e) {
+			
+			// find li with data id and remove the element and all bound events
+			$('li[data-id="' + id + '"]').remove();
+
+			// loop through gifs array
+			$.each(gifs, function (i) {
+
+				// if the gif id matches, remove it 
+				if(gifs[i].id === id) {
+					gifs.splice(i,1);
+					return false;
+				}
+
+			});
+
+			// if the gifs array is empty, show the no-gifs element
+			if (gifs.length === 0) { $('#no-gifs').show(); }
+
+			// store gifs in localStorage
+			gifsToStore = JSON.stringify(gifs);					// stringify gifs array
+			localStorage.setItem('gifs', gifsToStore);	// store gifs in localStorage
+		}
+		
+		// create new gif from gallery form and append to gifs
+		function createGif(e) {
+
+			var formElements = document.getElementById('gallery-form').elements;	// store form elements
+			var url = formElements.url.value;																			// get url value
+			var filename = url.substring(url.lastIndexOf('/')+1);									// get filename from url
+			var ext = filename.split('.').pop();																	// split filename and get extension
+
+			// if the url value is not empty and the extension is a gif or a jpg
+			if ((formElements.url.value.length !== 0) && (ext === 'gif' || ext === 'jpg' || ext === 'jpeg')) {
+				
+				// create the new gif object
+				var gif = {
+
+					id: Date.now(),								// store id as current timestamp
+					title: '',										// store a blank title for future version
+					url: formElements.url.value,	// store url
+					tags: [],											// store tags for future version
+					isFavorite: false							// store favorite status for future version
+
+				};
+
+				gifs.unshift(gif);													// add gif to gifs array
+				gifsToStore = JSON.stringify(gifs);					// stringify gifs
+				localStorage.setItem('gifs', gifsToStore);	// store gifs in localStorage
+				formElements.url.value = '';								// reset value of url input
+				formElements.url.focus();										// reset focus to url input
+				appendGif(gif, prepend);										// append gif to gallery
+
+				// hide no-gif element if it exists
+				if ($('#no-gifs').is(':visible')) {
+					$('#no-gifs').hide();
+				}
+
+				// hide gallery form modal
+				$('#gallery-form-modal').modal('hide');
+				
+				// show success alert
+				flash.start('Your gif has been stashed!','Woohoo!','success');
+				
+				e.stopPropagation();	// stop click from propagating
+
+			} else {
+
+				// if extension is not a gif or a jpg
+				if (ext !== 'gif' || ext !== 'jpg' || ext !== 'jpeg') {
+
+					// hide the gallery form modal
+					$('#gallery-form-modal').modal('hide');
+
+					// show danger alert
+					flash.start('There was a problem! Are you sure that it\'s a gif link?','Oh noes!','danger');
+
+				}
+
+				e.stopPropagation();	// stop the click from propagating
+				return false;					// 
+				
+			}
+
 			e.preventDefault();
-		} else {
-			if (ext !== 'gif' || ext !== 'jpg') {
-				$('#menu-form-modal').modal('hide');
-				flash.start('There was a problem! Are you sure that it\'s a gif link?','Oh noes!','danger');
-			}
-			e.preventDefault();
-			return false;
-		}
-	}
-	
-	// initial menu setup
-	function init(){
-		if (gifs.length === 0) {
-			$('#no-gifs').show();
-		} else {
-			$('#no-gifs').hide();
-
-			for(var i = 0; i < loadLimit && i <= gifs.length; i++){
-				appendGif(gifs[i]);
-			}
 		}
 		
-		$(menuForm).bind('click',function (e) {
-			e.stopPropagation();
-		});
+		// initial gallery setup
+		function init(){
+			if (gifs.length === 0) {
+				$('#no-gifs').show();
+			} else {
+				$('#no-gifs').hide();
 
-		$('.cancel-btn').bind('click',function () {
-			$('.modal').modal('hide');
-		});
+				for(var i = 0; i < loadLimit && i <= (gifs.length - 1); i++){
+					appendGif(gifs[i]);
+				}
+			}
 
-		var menuBox = $('#menu');
+			$('.cancel-btn').bind('click',function () {
+				$('.modal').modal('hide');
+			});
 
-		menuBox.bind('scroll', function() {
-			if($(window).scrollTop() == $(document).height() - $(window).height()){
-				if (loadLimit < gifs.length) {
-					// load the next 16 gifs
-					var oldLoadLimit = loadLimit;
-					loadLimit = loadLimit + 16;
-					for(var i = oldLoadLimit; i < loadLimit && i <= gifs.length; i++){
-						appendGif(gifs[i]);
+			var galleryView = $('#gallery-view');
+
+			galleryView.bind('scroll', function() {
+
+				if($(window).scrollTop() == $(document).height() - $(window).height()){
+					if (loadLimit < gifs.length) {
+						// load next 16 gifs
+						var oldLoadLimit = loadLimit;
+						loadLimit = loadLimit + 16;
+						for(var i = oldLoadLimit; i < loadLimit && i <= gifs.length; i++){
+							appendGif(gifs[i]);
+						}
 					}
 				}
-				bg.console.log(loadLimit, gifs.length);
-			}
-		});
-		
-		Utility.addEvent(menuForm, 'submit', createGif);
-		Utility.addEvent(clear, 'click', clearGifs);
-	}
-	
-	return {
-		appendGif: appendGif,
-		createGif: createGif,
-		init: init
-	};
-})();
 
-$(document).ready(function () {
-	Menu.init();
-});
+			});
+			
+			Utility.addEvent(galleryForm, 'submit', createGif);	// add listener for submit button on gallery form
+		}
+		
+		return {
+			appendGif: appendGif,
+			createGif: createGif,
+			init: init
+		};
+
+	}());
+
+	// when the document is ready, initialize the Stasher module
+	$(document).ready(function () { Stasher.init(); });
+
+}(window, document, jQuery));
