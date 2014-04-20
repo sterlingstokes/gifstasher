@@ -22,6 +22,7 @@
   },
   "background": {
     "scripts": [
+      "js/require.js",
       "js/background.js"
     ]
   },
