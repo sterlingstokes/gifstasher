@@ -11,7 +11,6 @@ define(["Utility"], function ( Utility ) {
   // Properties
 
   var bg = chrome.extension.getBackgroundPage(),              // store background page for logging
-      gifs = [],                                              // array for holding gifs
       gifsToStore,                                            // for holding stringified gifs array
       el = document.getElementById('gallery'),                // get gallery unordered list
       flash = Utility.flash,                                  // store local copy of flash
@@ -204,8 +203,9 @@ define(["Utility"], function ( Utility ) {
     // if gifs array is stored in localStorage, retrieve and parse
     if (localStorage.getItem('gifs')) {
       return JSON.parse(localStorage.getItem('gifs'));
+    } else {
+      return []; // array for holding gifs
     }
-
   }
 
   // initial gallery setup
@@ -213,6 +213,8 @@ define(["Utility"], function ( Utility ) {
 
     // if gifs array is stored in localStorage, retrieve and parse
     gifs = getStoredGifs();
+
+    console.log(gifs);
 
     // load gifs or show no-gif element
     if (gifs.length === 0) {
