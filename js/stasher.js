@@ -27,7 +27,7 @@ define(["Utility"], function ( Utility ) {
     var imgHolder = document.createElement('li');   // create li element
     imgHolder.className = 'gif';                    // add .gif class
     imgHolder.dataset.id = gif.id;                  // add data-id to li
-    
+
     // overlay div
     var overlay = document.createElement('div');  // create div element
     overlay.className = 'overlay';                // add .overlay class
@@ -75,7 +75,7 @@ define(["Utility"], function ( Utility ) {
     overlay.appendChild(viewBtn);
     overlay.appendChild(copyBtn);
     overlay.appendChild(unstashBtn);
-    
+
     // append all the things to the image holder
     imgHolder.appendChild(img);
     imgHolder.appendChild(overlay);
@@ -132,19 +132,31 @@ define(["Utility"], function ( Utility ) {
 
   }
 
+  function isAlreadyStashed(url) {
+    var gifs = getStoredGifs();
+    var isAlreadyStashed = false;
+    for ( var i =0; i < gifs.length; i ++ ) {
+      gifToCheck = gifs[i];
+      if ( gifToCheck.url ==  url) {
+        isAlreadyStashed = true;
+      }
+    }
+    return isAlreadyStashed;
+  }
+
 
 
   // create new gif from gallery form and append to gifs
   function createGif(e) {
-
     var formElements = document.getElementById('gallery-form').elements;  // store form elements
     var url = formElements.url.value;                                     // get url value
     var filename = url.substring(url.lastIndexOf('/')+1);                 // get filename from url
     var ext = filename.split('.').pop();                                  // split filename and get extension
+    var isThisGifStashed = isAlreadyStashed(url);
 
     // if the url value is not empty and the extension is a gif or a jpg
-    if ((formElements.url.value.length !== 0) && (ext === 'gif' || ext === 'jpg' || ext === 'jpeg')) {
-      
+    if ((formElements.url.value.length !== 0) && (ext === 'gif' || ext === 'jpg' || ext === 'jpeg') && !isThisGifStashed) {
+
       // create the new gif object
       var gif = {
 
@@ -161,7 +173,7 @@ define(["Utility"], function ( Utility ) {
       localStorage.setItem('gifs', gifsToStore);  // store gifs in localStorage
       formElements.url.value = '';                // reset value of url input
       formElements.url.focus();                   // reset focus to url input
-      
+
       // hide no-gif element if it exists
       if ($('#no-gifs').is(':visible')) {
         $('#no-gifs').hide();
@@ -169,10 +181,10 @@ define(["Utility"], function ( Utility ) {
 
       // hide gallery form modal
       $('#gallery-form-modal').modal('hide');
-      
+
       // show success alert
       flash.start('Your gif has been stashed!','Woohoo!','success');
-      
+
       e.stopPropagation();  // stop click from propagating
 
       appendGif(gif, prepend);  // append gif to gallery
@@ -180,7 +192,10 @@ define(["Utility"], function ( Utility ) {
     } else {
 
       // if extension is not a gif or a jpg
-      if (ext !== 'gif' || ext !== 'jpg' || ext !== 'jpeg') {
+      if(isAlreadyStashed) {
+        $('#gallery-form-modal').modal('hide');
+        flash.start('There was a problem! This gif is already stashed!','You really like this gif!','danger');
+      } else if (ext !== 'gif' || ext !== 'jpg' || ext !== 'jpeg') {
 
         // hide the gallery form modal
         $('#gallery-form-modal').modal('hide');
@@ -238,7 +253,7 @@ define(["Utility"], function ( Utility ) {
 
         // load next 16 gifs
         if (loadLimit < gifs.length) {
-          
+
           var oldLoadLimit = loadLimit; // store old load limit for counter
           loadLimit = loadLimit + 16;   // increment load limit
 
@@ -256,7 +271,7 @@ define(["Utility"], function ( Utility ) {
     $('.cancel-btn').bind('click',function () {
       $('.modal').modal('hide');
     });
-    
+
     // add listener for submit button on gallery form
     Utility.addEvent(galleryForm, 'submit', createGif);
 
@@ -276,14 +291,14 @@ define(["Utility"], function ( Utility ) {
 
   // remove gif from the gallery
   function removeGif(id, e) {
-    
+
     // find li with data id and remove the element and all bound events
     $('li[data-id="' + id + '"]').remove();
 
     // loop through gifs array
     $.each(gifs, function (i) {
 
-      // if the gif id matches, remove it 
+      // if the gif id matches, remove it
       if(gifs[i].id === id) {
         gifs.splice(i,1);
         return false;
@@ -298,10 +313,11 @@ define(["Utility"], function ( Utility ) {
     gifsToStore = JSON.stringify(gifs);         // stringify gifs array
     localStorage.setItem('gifs', gifsToStore);  // store gifs in localStorage
   }
-  
+
   return {
     appendGif: appendGif,
     createGif: createGif,
+    isAlreadyStashed: isAlreadyStashed,
     init: init
   };
 

@@ -15,7 +15,7 @@
 
 	// load Stasher and Utility module
 	require(["jquery", "stasher", "utility"], function ( $, Stasher, Utility ) {
-		
+
 		if (localStorage.getItem('gifs')) {
 			var gifs = JSON.parse(localStorage.getItem('gifs'));
 		}
@@ -38,7 +38,6 @@
 
 		// stash gif
 		function stashGif(info, isCopy) {
-
 			var url = JSON.stringify(info.srcUrl),
 					filename = url.substring(url.lastIndexOf('/')+1),
 					ext = filename.split('.').pop(),
