@@ -13,7 +13,6 @@ define(function () {
 
     // start flash
     start: function (message, title, type) {
-
       this.end();
       var flashElement = $('#flash-template').clone();            // clone flash-template
       flashElement.addClass('flash').attr('id','');               // add flash class and remove template id
